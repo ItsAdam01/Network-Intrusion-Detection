@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lynx NIDS + WAF | Technical Documentation</title>
+    <title>Lynx NIDS + WAF | Documentation Vault</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #080c0b;
@@ -16,16 +16,20 @@
             --text: #c8e8d8;
             --text-dim: #5a8870;
             --red: #e03050;
+            --sidebar-width: 260px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.6;
-            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
         }
 
         /* Cyber-grid background */
@@ -38,201 +42,297 @@
                 linear-gradient(90deg, var(--border) 1px, transparent 1px);
             background-size: 40px 40px;
             z-index: -1;
-            opacity: 0.3;
+            opacity: 0.2;
         }
 
-        /* Scanline effect */
-        body::after {
-            content: " ";
-            display: block;
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
             position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 9999;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        header {
-            border: 1px solid var(--accent);
-            padding: 20px;
-            margin-bottom: 40px;
+            left: 0; top: 0;
             background: var(--surface);
-            box-shadow: 0 0 15px rgba(0, 229, 160, 0.1);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
         }
 
-        .logo {
-            font-size: 1.5rem;
+        .sidebar-logo {
             font-weight: 600;
             color: var(--accent);
             letter-spacing: 2px;
             text-transform: uppercase;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .status-bar {
+        .nav-group {
+            margin-bottom: 25px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .nav-link {
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+            padding: 8px 0;
+            transition: color 0.2s;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+        }
+
+        /* Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 1100px;
+        }
+
+        section {
+            margin-bottom: 100px;
+            padding-top: 20px;
+        }
+
+        header {
+            margin-bottom: 60px;
+        }
+
+        .project-meta {
             display: flex;
             gap: 20px;
-            margin-top: 10px;
             font-size: 11px;
             color: var(--text-dim);
             text-transform: uppercase;
+            margin-top: 10px;
         }
 
-        .status-item span { color: var(--accent); }
+        .meta-item span { color: var(--accent); }
 
-        h2 {
-            font-size: 1.2rem;
-            color: var(--accent);
-            margin: 30px 0 15px;
-            text-transform: uppercase;
+        h1 { font-size: 2.2rem; font-weight: 600; letter-spacing: -1px; }
+        h2 { 
+            font-size: 1.4rem; 
+            color: var(--accent); 
+            margin: 40px 0 20px; 
+            text-transform: uppercase; 
             letter-spacing: 1px;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 5px;
+            padding-bottom: 10px;
         }
+        h3 { font-size: 1rem; margin: 25px 0 12px; color: var(--text); }
 
-        p { margin-bottom: 15px; color: var(--text); }
+        p { margin-bottom: 18px; color: var(--text); max-width: 800px; }
 
         .note {
             background: rgba(224, 48, 80, 0.05);
             border-left: 3px solid var(--red);
             padding: 15px;
-            margin: 20px 0;
+            margin: 25px 0;
         }
 
         .note strong { color: var(--red); text-transform: uppercase; }
 
         code {
-            background: var(--surface);
+            background: rgba(0, 229, 160, 0.05);
             padding: 2px 5px;
             border-radius: 3px;
             color: var(--accent);
         }
 
         pre {
-            background: var(--surface);
+            background: #050807;
             padding: 20px;
             border: 1px solid var(--border);
             overflow-x: auto;
-            margin-bottom: 20px;
+            margin: 20px 0;
             color: var(--accent);
+            font-size: 12px;
         }
 
-        .grid-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(13, 18, 16, 0.5);
         }
 
-        @media (max-width: 600px) {
-            .grid-section { grid-template-columns: 1fr; }
-        }
-
-        .card {
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
             border: 1px solid var(--border);
-            padding: 20px;
-            background: rgba(13, 18, 16, 0.8);
         }
 
-        .card h3 {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: var(--text);
+        th {
+            background: var(--surface);
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border: 1px solid currentColor;
+            border-radius: 2px;
+            text-transform: uppercase;
         }
 
         footer {
-            margin-top: 60px;
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-dim);
+            margin-top: 100px;
             border-top: 1px solid var(--border);
-            padding-top: 20px;
+            padding-top: 30px;
+            color: var(--text-dim);
+            font-size: 11px;
         }
 
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 40px 20px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <nav class="sidebar">
+        <div class="sidebar-logo">LYNX_SEC</div>
+        
+        <div class="nav-group">
+            <span class="nav-label">Core</span>
+            <a href="#essence" class="nav-link">Project Essence</a>
+            <a href="#guides" class="nav-link">Guides</a>
+        </div>
+
+        <div class="nav-group">
+            <span class="nav-label">Development</span>
+            <a href="#journey" class="nav-link">Journey</a>
+            <a href="#setup" class="nav-link">Setup</a>
+        </div>
+
+        <div class="nav-group">
+            <span class="nav-label">Analysis</span>
+            <a href="#technical" class="nav-link">Technical Deep Dive</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
         <header>
-            <div class="logo">LYNX_NIDS_WAF <span class="blink">_</span></div>
-            <div class="status-bar">
-                <div class="status-item">Build: <span>STABLE</span></div>
-                <div class="status-item">Security: <span>ACTIVE</span></div>
-                <div class="status-item">Environment: <span>DOCKER_CONTAINERIZED</span></div>
+            <h1>Network Intrusion Detection System</h1>
+            <div class="project-meta">
+                <div class="meta-item">Status: <span>Live_Environment</span></div>
+                <div class="meta-item">Build: <span>2025.05.23</span></div>
+                <div class="meta-item">Coverage: <span>100+ Tests</span></div>
             </div>
         </header>
 
-        <section id="journey">
-            <h2>Journey & Implementation Story</h2>
+        <section id="essence">
+            <h2>Project Essence</h2>
             <p>
-                This project started as a deep dive into how network traffic actually moves through a system. I wanted to move beyond just reading logs and instead see the raw packets as they hit the wire.
+                I built this project to understand how security professionals monitor network and application layers in real time. It combines a Network Intrusion Detection System (NIDS) and a Web Application Firewall (WAF) into a single terminal-style dashboard.
             </p>
+            <h3>NIDS Functionality</h3>
             <p>
-                The biggest challenge was loopback sniffing. On many Linux distributions, standard Layer 3 sockets miss traffic sent to <code>localhost</code>. I had to pivot to using Scapy's Layer 2 <code>sendp()</code> and <code>sniff()</code> logic, which required a much deeper understanding of Ethernet frames and interface indices.
+                The NIDS engine sniffs traffic across all interfaces using Scapy. It looks for patterns that suggest reconnaissance or denial-of-service attempts.
             </p>
+            <table>
+                <thead>
+                    <tr><th>Attack Type</th><th>Severity</th><th>Identification</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>ICMP Echo</td><td>Low</td><td>Detects type 8 request packets</td></tr>
+                    <tr><td>NULL Scan</td><td>Medium</td><td>TCP flags set to 0x00</td></tr>
+                    <tr><td>XMAS Scan</td><td>Medium</td><td>TCP FIN+PSH+URG combination</td></tr>
+                    <tr><td>Port Scan</td><td>Medium</td><td>8 unique SYN ports in 30s window</td></tr>
+                    <tr><td>SYN Flood</td><td>Critical</td><td>15 rapid SYNs to non-service ports</td></tr>
+                </tbody>
+            </table>
+            <h3>WAF Functionality</h3>
             <p>
-                The WAF evolved from a simple set of regex strings to a contextual inspector. I learned early on that infrastructure headers (like <code>Host</code> or <code>Content-Type</code>) often contain words like "DELETE" or "UPDATE" that would trigger false positives. The current implementation uses a whitelist approach, only scanning user-controlled inputs to ensure high fidelity detection.
+                The WAF acts as an application-level inspector, intercepting HTTP data to block common injection vectors before they reach the backend logic.
             </p>
         </section>
 
-        <section id="architecture">
-            <h2>Technical Architecture</h2>
-            <div class="grid-section">
-                <div class="card">
-                    <h3>NIDS Engine (Port 5000)</h3>
-                    <p>Uses Scapy for asynchronous packet capture. It analyzes TCP flags, ICMP types, and payload patterns to detect scans and floods.</p>
-                </div>
-                <div class="card">
-                    <h3>WAF/IDS (Port 5001)</h3>
-                    <p>A Flask-based inspector that validates HTTP request bodies, paths, and headers against injection patterns.</p>
-                </div>
-            </div>
+        <section id="guides">
+            <h2>Guides</h2>
+            <h3>Attack Simulator</h3>
             <p>
-                Both servers emit events via <strong>Socket.IO</strong> to a React frontend, providing a real-time "Threat Feed" that updates without page refreshes.
+                To test the NIDS without external tools, I included an internal simulator. You can trigger these via the dashboard UI or the CLI script:
+            </p>
+            <pre>cd backend
+sudo python attacker.py</pre>
+            <p>
+                The simulator sends raw packets to loopback, exercising the NIDS detection logic for everything from stealthy scans to aggressive floods.
+            </p>
+            <h3>Request Inspector</h3>
+            <p>
+                The WAF tab features a Request Inspector where you can craft custom HTTP payloads. For example, sending a <code>UNION SELECT</code> string will trigger a SQL Injection alert immediately in the feed.
+            </p>
+        </section>
+
+        <section id="journey">
+            <h2>Journey</h2>
+            <p>
+                One of the biggest hurdles I faced was loopback sniffing on Linux. I learned that standard sockets often bypass the networking stack for local traffic. I had to pivot my engine to use Scapy Layer 2 sockets (<code>sendp()</code>) to ensure the sniffer could actually "see" the packets I was sending from the simulator.
+            </p>
+            <p>
+                I also spent a lot of time learning why security tools trigger false positives. In my early WAF drafts, simple words like "DELETE" in a <code>Content-Type</code> header would block the request. I solved this by moving to a whitelist approach: only scanning user-controlled inputs like the body, path, and specific cookies.
             </p>
         </section>
 
         <section id="setup">
-            <h2>Setup Guide</h2>
-            <div class="note">
-                <strong>Critical Security Note:</strong> The NIDS engine requires <code>sudo</code> (root) privileges to open raw sockets for network sniffing. In the Docker environment, this is handled by <code>privileged: true</code> and <code>network_mode: host</code>.
-            </div>
-            <h3>Local Startup</h3>
+            <h2>Setup</h2>
+            <h3>Local Environment</h3>
             <pre># Install dependencies
-pip install -r backend/requirements.txt
+pip install flask flask-socketio flask-cors scapy pytest
 
-# Start NIDS (Requires Sudo)
+# Start NIDS (Root required for raw sockets)
 sudo python backend/app.py
 
 # Start WAF
 python backend/waf_app.py</pre>
-
             <h3>Docker Deployment</h3>
+            <p>
+                I containerized the stack to make it portable. The NIDS container uses <code>network_mode: host</code> so it can actually reach the host's networking interfaces.
+            </p>
             <pre>docker-compose up --build</pre>
         </section>
 
-        <section id="poc">
-            <h2>Demonstration & Validation</h2>
+        <section id="technical">
+            <h2>Technical Deep Dive</h2>
+            <h3>Detection Rules</h3>
             <p>
-                The <strong>Attack Simulator</strong> allows for safe, controlled testing of NIDS rules. When a "SYN Flood" is triggered, the engine tracks the rapid succession of SYN packets and emits a "Critical" alert once the threshold is crossed.
+                My detection logic uses a sliding window approach for rate-based attacks. For SYN floods, the engine tracks source IPs and clears counters every 15 seconds to avoid memory bloat.
             </p>
+            <h3>The Pytest Suite</h3>
             <p>
-                The WAF's robustness is backed by over <strong>100 test cases</strong> in <code>test_waf.py</code>, covering edge cases for SQL injection, XSS, and path traversal across various encoding formats.
+                I maintained a mandatory test-driven approach. The <code>test_waf.py</code> suite contains over 100 test cases that validate:
+            </p>
+            <ul>
+                <li>SQL injection patterns (including encoded variants)</li>
+                <li>XSS payloads in various headers</li>
+                <li>Path traversal attempts (Unix and Windows styles)</li>
+                <li>Malicious User-Agent strings</li>
+            </ul>
+            <p>
+                Every time I added a new WAF rule, I had to ensure it didn't break existing functionality or introduce new false positives.
             </p>
         </section>
 
         <footer>
-            TERMINAL_SESSION_ID: 0x9f2a4b | EST_TIME: 2025-05-20 | REPO: Lynx-FIM
+            LOG_END_SESSION_2025: NIDS Documentation Project
         </footer>
-    </div>
+    </main>
 </body>
 </html>
