@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  nids:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nids-backend
+    user: root
+    # network_mode: host gives Scapy direct access to host interfaces
+    # privileged: true is needed for raw socket operations
+    network_mode: host
+    privileged: true
+    volumes:
+      - ./backend:/app
+    command: python app.py
+    restart: unless-stopped
+
+  waf:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: waf-backend
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./backend:/app
+    command: python waf_app.py
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_NIDS_URL=http://localhost:5000
+        - REACT_APP_WAF_URL=http://localhost:5001
+    container_name: react-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_NIDS_URL=http://localhost:5000
+      - REACT_APP_WAF_URL=http://localhost:5001
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    depends_on:
+      - waf
+    restart: unless-stopped

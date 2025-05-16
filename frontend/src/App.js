@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-const nidsSocket = io('http://localhost:5000');
-const wafSocket  = io('http://localhost:5001');
+const NIDS_URL = process.env.REACT_APP_NIDS_URL || 'http://localhost:5000';
+const WAF_URL  = process.env.REACT_APP_WAF_URL  || 'http://localhost:5001';
+
+const nidsSocket = io(NIDS_URL);
+const wafSocket  = io(WAF_URL);
 
 //  Palette 
 const C = {
@@ -439,7 +442,7 @@ function NidsTester() {
     setLoading(true);
     setResult(null);
     try {
-      const r = await fetch('http://localhost:5000/simulate', {
+      const r = await fetch(`${NIDS_URL}/simulate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ attack: selected.id }),
@@ -447,7 +450,7 @@ function NidsTester() {
       const data = await r.json();
       setResult(data.ok ? 'sent' : (data.error || 'error'));
     } catch (e) {
-      setResult(`Cannot reach app.py — ${e.message}`);
+      setResult(`Cannot reach NIDS — ${e.message}`);
     }
     setLoading(false);
     setTimeout(() => setResult(null), 4000);
@@ -592,7 +595,7 @@ function WafTester() {
   const run = async () => {
     setLoading(true); setResult(null);
     try {
-      const r = await fetch('http://localhost:5001/inspect', {
+      const r = await fetch(`${WAF_URL}/inspect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ method: 'POST', path, body, headers: { 'User-Agent': ua }, params: {} }),
