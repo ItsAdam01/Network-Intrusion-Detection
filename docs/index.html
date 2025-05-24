@@ -217,7 +217,7 @@
 
         <div class="nav-group">
             <span class="nav-label">Development</span>
-            <a href="#journey" class="nav-link">Journey</a>
+            <a href="#story" class="nav-link">Implementation Story</a>
             <a href="#setup" class="nav-link">Setup</a>
         </div>
 
@@ -281,14 +281,43 @@ sudo python attacker.py</pre>
             </p>
         </section>
 
-        <section id="journey">
-            <h2>Journey</h2>
-            <p>
-                One of the biggest hurdles I faced was loopback sniffing on Linux. I learned that standard sockets often bypass the networking stack for local traffic. I had to pivot my engine to use Scapy Layer 2 sockets (<code>sendp()</code>) to ensure the sniffer could actually "see" the packets I was sending from the simulator.
-            </p>
-            <p>
-                I also spent a lot of time learning why security tools trigger false positives. In my early WAF drafts, simple words like "DELETE" in a <code>Content-Type</code> header would block the request. I solved this by moving to a whitelist approach: only scanning user-controlled inputs like the body, path, and specific cookies.
-            </p>
+        <section id="story">
+            <h2>Implementation Story</h2>
+            
+            <div class="story-entry">
+                <h3>March 10, 2025: The Beginning</h3>
+                <p>
+                    I have started sketching out the architecture for what I hope will be a security-first dashboard. I want to see exactly what is happening on my network, not just high-level summaries. I have decided to go with Python for the backend: it is readable, and the Scapy library seems incredibly flexible for working with raw packets. I am a bit nervous about the performance overhead of Python for a sniffer, but for a learning project, the ability to rapidly prototype new detection rules is more important to me right now.
+                </p>
+            </div>
+
+            <div class="story-entry">
+                <h3>March 28, 2025: The Loopback Wall</h3>
+                <p>
+                    I hit a massive wall today. I spent hours trying to figure out why my sniffer could not see any of the attack packets I was sending from my own machine. I was using a standard socket listener, but it turns out that on Linux, local traffic on the loopback interface often bypasses the parts of the networking stack where standard sockets live. It was incredibly frustrating. Then I had an aha! moment after digging through some old forums: I need to use Scapy Layer 2 sockets and the sendp() function to talk directly to the interface. Once I made the switch, the terminal finally started lighting up with the ICMP packets I was injecting. It felt like I finally found the key to the front door.
+                </p>
+            </div>
+
+            <div class="story-entry">
+                <h3>April 15, 2025: WAF & False Positives</h3>
+                <p>
+                    Moving up the stack to the Web Application Firewall today. I am using Flask to intercept and inspect incoming HTTP requests. I ran into a classic beginner mistake: false positives. I noticed that my WAF was blocking perfectly legitimate requests just because they contained the word DELETE in the headers. It was a nightmare. I realized I was looking at the wrong headers and being way too aggressive with my pattern matching. This taught me a valuable lesson about fail-open versus fail-closed security. I have decided to move to a whitelist-only approach for user inputs, specifically targeting the request body and URL parameters. It is much cleaner and way less prone to breaking the app for actual users.
+                </p>
+            </div>
+
+            <div class="story-entry">
+                <h3>May 10, 2025: Testing & Polish</h3>
+                <p>
+                    It is finally coming together. I just hit a milestone of 100+ passing tests in the test_waf.py suite. It took a long time to write all those edge cases for SQL injection and XSS, but seeing that wall of green text in the terminal is so satisfying. The highlight of the day was seeing the first real-time SQLi alert pop up in the React frontend. I am using Socket.IO to stream alerts from the Python engine, and seeing that terminal-style notification slide in when I sent a malicious UNION SELECT payload made all the late nights worth it.
+                </p>
+            </div>
+
+            <div class="story-entry">
+                <h3>Reflections</h3>
+                <p>
+                    Building this project from scratch has changed how I think about security. It is not just about setting up a firewall and walking away: it is about visibility and constant, rigorous testing. If you cannot see the traffic, you cannot defend against it. I am coming out of this with a much deeper respect for the tools I use every day.
+                </p>
+            </div>
         </section>
 
         <section id="setup">
